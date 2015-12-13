@@ -14,6 +14,16 @@ DURATION_MINUTES = int(config.get('settings', 'duration_minutes'))
 BREAKFAST_HOUR = int(config.get('settings', 'breakfast_hour'))
 DINNER_HOUR = int(config.get('settings', 'dinner_hour'))
 SLEEP = int(config.get('settings', 'sleep'))
+DROPBOX_ACCESS_TOKEN = config.get('dropbox', 'access_token')
+
+import dropbox
+dropbox_client = dropbox.client.DropboxClient(DROPBOX_ACCESS_TOKEN)
+
+def upload(path, short_url=True):
+    dropbox_path = os.path.basename(path)
+    dropbox_client.put_file('/' + dropbox_path, open(path, 'rb'))
+    share_response = dropbox_client.share(dropbox_path, short_url=short_url)
+    return share_response['url']
 
 def make_time(hour=0, minute=0):
     today = datetime.now()
@@ -93,6 +103,8 @@ if __name__ == '__main__':
                     print
 
                     output_gif(path)
+                    print
+                    print upload(path)
                     delete_images()
 
                     print

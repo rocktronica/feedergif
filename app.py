@@ -74,10 +74,20 @@ def get_image_slugs():
         return [os.path.basename(filename).split('.')[0] for filename in images]
     return []
 
+def set_torch(on):
+    os.system('curl --silent ' + HOST + '/parameters?torch=' + str(int(on)) + \
+        ' > /dev/null')
+
 if __name__ == '__main__':
+    on = False
+
     while True:
+        previously_on = on
         now = datetime.now().replace(microsecond=0)
         on = within_ranges(now, ranges)
+
+        if (on and not previously_on):
+            set_torch(True)
 
         print str(now) + "\t" + ('On' if on else 'Off')
 
@@ -106,6 +116,7 @@ if __name__ == '__main__':
                     print
                     print upload(path)
                     delete_images()
+                    set_torch(False)
 
                     print
                     print '------------'

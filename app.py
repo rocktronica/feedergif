@@ -16,6 +16,9 @@ DINNER_HOUR = int(config.get('settings', 'dinner_hour'))
 SLEEP = int(config.get('settings', 'sleep'))
 DROPBOX_ACCESS_TOKEN = config.get('dropbox', 'access_token')
 
+IFTTT_HUE_LIGHTS_ON = config.get('ifttt', 'hue_lights_on')
+IFTTT_HUE_LIGHTS_OFF = config.get('ifttt', 'hue_lights_off')
+
 import dropbox
 dropbox_client = dropbox.client.DropboxClient(DROPBOX_ACCESS_TOKEN)
 
@@ -74,9 +77,9 @@ def get_image_slugs():
         return [os.path.basename(filename).split('.')[0] for filename in images]
     return []
 
-def set_torch(on):
-    os.system('curl --silent ' + HOST + '/parameters?torch=' + str(int(on)) + \
-        ' > /dev/null')
+def set_lights(on):
+    ifttt_url = IFTTT_HUE_LIGHTS_ON if on else IFTTT_HUE_LIGHTS_OFF
+    os.system('curl --silent ' + ifttt_url + ' > /dev/null')
 
 if __name__ == '__main__':
     on = False
@@ -87,7 +90,7 @@ if __name__ == '__main__':
         on = within_ranges(now, ranges)
 
         if (on and not previously_on):
-            set_torch(True)
+            set_lights(True)
 
         print str(now) + "\t" + ('On' if on else 'Off')
 
@@ -116,7 +119,7 @@ if __name__ == '__main__':
                     print
                     print upload(path)
                     delete_images()
-                    set_torch(False)
+                    set_lights(False)
 
                     print
                     print '------------'

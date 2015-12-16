@@ -1,12 +1,11 @@
-from datetime import datetime
+import ConfigParser
+import datetime
+import dropbox
+import glob
+import os
 import time
 
-from subprocess import call
-import os
-from glob import glob
-
-from ConfigParser import ConfigParser
-config = ConfigParser()
+config = ConfigParser.ConfigParser()
 config.read('settings.ini')
 
 HOST = config.get('settings', 'host')
@@ -15,21 +14,11 @@ BREAKFAST_HOUR = int(config.get('settings', 'breakfast_hour'))
 DINNER_HOUR = int(config.get('settings', 'dinner_hour'))
 SLEEP = int(config.get('settings', 'sleep'))
 DROPBOX_ACCESS_TOKEN = config.get('dropbox', 'access_token')
-
 IFTTT_HUE_LIGHTS_ON = config.get('ifttt', 'hue_lights_on')
 IFTTT_HUE_LIGHTS_OFF = config.get('ifttt', 'hue_lights_off')
 
-import dropbox
-dropbox_client = dropbox.client.DropboxClient(DROPBOX_ACCESS_TOKEN)
-
-def upload(path, short_url=True):
-    dropbox_path = os.path.basename(path)
-    dropbox_client.put_file('/' + dropbox_path, open(path, 'rb'))
-    share_response = dropbox_client.share(dropbox_path, short_url=short_url)
-    return share_response['url']
-
 def make_time(hour=0, minute=0):
-    today = datetime.now()
+    today = datetime.datetime.now()
     return today.replace(hour=hour, minute=minute, second=0, microsecond=0)
 
 ranges = [{
@@ -40,26 +29,24 @@ ranges = [{
     'stop': make_time(DINNER_HOUR, DURATION_MINUTES)
 }]
 
-def within_range(now, start, stop):
-    return (start <= now and stop >= now)
+dropbox_client = dropbox.client.DropboxClient(DROPBOX_ACCESS_TOKEN)
+
+def upload(path, short_url=True):
+    dropbox_path = os.path.basename(path)
+    dropbox_client.put_file('/' + dropbox_path, open(path, 'rb'))
+    share_response = dropbox_client.share(dropbox_path, short_url=short_url)
+    return share_response['url']
 
 def within_ranges(now, ranges=[]):
+    return bool(datetime.datetime.now().minute % 2)
+
+    def within_range(now, start, stop):
+        return (start <= now and stop >= now)
+
     for range in ranges:
         if within_range(now, range['start'], range['stop']):
             return True
     return False
-
-def test_within_range():
-    hour = 0
-    while (hour < 24):
-        minute = 0
-        while (minute < 60):
-            time = make_time(hour, minute)
-            on = within_ranges(time, ranges)
-
-            print str(time) + "\t" + str(on)
-            minute = minute + 1
-        hour = hour + 1
 
 def delete_images():
     os.system('rm -f images/*')
@@ -71,7 +58,7 @@ def output_gif(filename):
     os.system('ffmpeg -pattern_type glob -i \'images/*.jpg\' -r 30 -vf scale=320:-1 "' + filename + '"')
 
 def get_image_slugs():
-    images = glob('images/*.jpg')
+    images = glob.glob('images/*.jpg')
 
     if len(images) >= 1:
         return [os.path.basename(filename).split('.')[0] for filename in images]
@@ -81,12 +68,24 @@ def set_lights(on):
     ifttt_url = IFTTT_HUE_LIGHTS_ON if on else IFTTT_HUE_LIGHTS_OFF
     os.system('curl --silent ' + ifttt_url + ' > /dev/null')
 
-if __name__ == '__main__':
+def test_ranges():
+    hour = 0
+    while (hour < 24):
+        minute = 0
+        while (minute < 60):
+            time = make_time(hour, minute)
+            on = within_ranges(time, ranges)
+
+            print str(time) + "\t" + str(on)
+            minute = minute + 1
+        hour = hour + 1
+
+def main():
     on = False
 
     while True:
         previously_on = on
-        now = datetime.now().replace(microsecond=0)
+        now = datetime.datetime.now().replace(microsecond=0)
         on = within_ranges(now, ranges)
 
         if (on and not previously_on):
@@ -126,3 +125,6 @@ if __name__ == '__main__':
                     print
 
         time.sleep(SLEEP)
+
+if __name__ == '__main__':
+    main()

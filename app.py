@@ -39,8 +39,6 @@ def upload(path, short_url=True):
     return share_response['url']
 
 def within_ranges(now, ranges=[]):
-    return bool(datetime.datetime.now().minute % 2)
-
     def within_range(now, start, stop):
         return (start <= now and stop >= now)
 

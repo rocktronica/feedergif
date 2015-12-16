@@ -13,6 +13,7 @@ DURATION_MINUTES = int(config.get('settings', 'duration_minutes'))
 BREAKFAST_HOUR = int(config.get('settings', 'breakfast_hour'))
 DINNER_HOUR = int(config.get('settings', 'dinner_hour'))
 SLEEP = int(config.get('settings', 'sleep'))
+SCALE = int(config.get('settings', 'scale'))
 DROPBOX_ACCESS_TOKEN = config.get('dropbox', 'access_token')
 IFTTT_HUE_LIGHTS_ON = config.get('ifttt', 'hue_lights_on')
 IFTTT_HUE_LIGHTS_OFF = config.get('ifttt', 'hue_lights_off')
@@ -54,8 +55,15 @@ def delete_images():
 def download_image():
     os.system('curl -# -L --compressed ' + HOST + '/photo > "images/$(date +%s).jpg"')
 
-def output_gif(filename):
-    os.system('ffmpeg -pattern_type glob -i \'images/*.jpg\' -r 30 -vf scale=320:-1 "' + filename + '"')
+def output_gif(filename, width=None):
+    command = 'ffmpeg -pattern_type glob -i \'images/*.jpg\' -r 30'
+
+    if width:
+        command = command + ' -vf scale=' + str(width) + ':-1'
+
+    command = command + ' ' + filename
+
+    os.system(command)
 
 def get_image_slugs():
     images = glob.glob('images/*.jpg')
@@ -114,7 +122,7 @@ def main():
                         + first + ' TO ' + last
                     print
 
-                    output_gif(path)
+                    output_gif(path, SCALE)
                     print
                     print upload(path)
                     delete_images()

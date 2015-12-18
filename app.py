@@ -1,8 +1,9 @@
 import ConfigParser
 import datetime
-import dropbox
+import pysftp
 import glob
 import os
+import sys
 import time
 
 config = ConfigParser.ConfigParser()
@@ -14,7 +15,10 @@ BREAKFAST_HOUR = int(config.get('settings', 'breakfast_hour'))
 DINNER_HOUR = int(config.get('settings', 'dinner_hour'))
 SLEEP = int(config.get('settings', 'sleep'))
 SCALE = int(config.get('settings', 'scale'))
-DROPBOX_ACCESS_TOKEN = config.get('dropbox', 'access_token')
+SFTP_HOST = config.get('sftp', 'host')
+SFTP_USERNAME = config.get('sftp', 'username')
+SFTP_PASSWORD = config.get('sftp', 'password')
+SFTP_PATH = config.get('sftp', 'path')
 IFTTT_HUE_LIGHTS_ON = config.get('ifttt', 'hue_lights_on')
 IFTTT_HUE_LIGHTS_OFF = config.get('ifttt', 'hue_lights_off')
 
@@ -32,13 +36,18 @@ ranges = [{
     'stop': make_time(DINNER_HOUR, DURATION_MINUTES)
 }]
 
-dropbox_client = dropbox.client.DropboxClient(DROPBOX_ACCESS_TOKEN)
+def upload(path):
+    srv = pysftp.Connection(
+        host=SFTP_HOST,
+        username=SFTP_USERNAME,
+        password=SFTP_PASSWORD)
 
-def upload(path, short_url=True):
-    dropbox_path = os.path.basename(path)
-    dropbox_client.put_file('/' + dropbox_path, open(path, 'rb'))
-    share_response = dropbox_client.share(dropbox_path, short_url=short_url)
-    return share_response['url']
+    with srv.cd(SFTP_PATH):
+        srv.put(path)
+
+    srv.close()
+
+    return 'http://' + SFTP_PATH + '/' + os.path.basename(path)
 
 def within_ranges(now, ranges=[]):
     def within_range(now, start, stop):

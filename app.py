@@ -124,6 +124,8 @@ def main():
                 path = 'output/' + last.split('.')[0] + '.gif'
 
                 if not os.path.isfile(path):
+                    set_lights(False)
+
                     print
                     print '------------'
                     print
@@ -137,7 +139,6 @@ def main():
                     print
                     print upload(path)
                     delete_images()
-                    set_lights(False)
 
                     print
                     print '------------'

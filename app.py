@@ -20,7 +20,9 @@ IFTTT_HUE_LIGHTS_OFF = config.get('ifttt', 'hue_lights_off')
 
 def make_time(hour=0, minute=0):
     today = datetime.datetime.now()
-    return today.replace(hour=hour, minute=minute, second=0, microsecond=0)
+    return datetime.datetime.time(
+        today.replace(hour=hour, minute=minute, second=0, microsecond=0)
+    )
 
 ranges = [{
     'start': make_time(BREAKFAST_HOUR),
@@ -91,7 +93,9 @@ def main():
 
     while True:
         previously_on = on
-        now = datetime.datetime.now().replace(microsecond=0)
+        now = datetime.datetime.time(
+            datetime.datetime.now()
+        )
         on = within_ranges(now, ranges)
 
         if (on and not previously_on):

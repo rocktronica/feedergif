@@ -4,6 +4,7 @@ import pysftp
 import glob
 import os
 import sys
+import subprocess
 import time
 
 config = ConfigParser.ConfigParser()
@@ -59,10 +60,19 @@ def within_ranges(now, ranges=[]):
     return False
 
 def delete_images():
-    os.system('rm -f images/*')
+    call('rm -f images/*')
 
 def download_image():
-    os.system('curl -# -L --compressed ' + HOST + '/photo > "images/$(date +%s).jpg"')
+    call('curl -# -L --compressed ' + HOST + '/photo > "images/$(date +%s).jpg"')
+
+def call(command):
+    try:
+        print subprocess.check_output(
+            command,
+            stderr=subprocess.STDOUT,
+            shell=True)
+    except subprocess.CalledProcessError, e:
+        print e.output
 
 def output_gif(filename, width=None):
     command = 'ffmpeg -pattern_type glob -i \'images/*.jpg\' -r 30'
@@ -71,8 +81,7 @@ def output_gif(filename, width=None):
         command = command + ' -vf scale=' + str(width) + ':-1'
 
     command = command + ' ' + filename
-
-    os.system(command)
+    call(command)
 
 def get_image_slugs():
     images = glob.glob('images/*.jpg')
@@ -83,7 +92,7 @@ def get_image_slugs():
 
 def set_lights(on):
     ifttt_url = IFTTT_HUE_LIGHTS_ON if on else IFTTT_HUE_LIGHTS_OFF
-    os.system('curl --silent ' + ifttt_url + ' > /dev/null')
+    call('curl --silent ' + ifttt_url + ' > /dev/null')
 
 def test_ranges():
     hour = 0

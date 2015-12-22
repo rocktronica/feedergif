@@ -1,11 +1,14 @@
 import ConfigParser
 import datetime
+import logging
 import pysftp
 import glob
 import os
 import sys
 import subprocess
 import time
+
+logging.basicConfig(filename='logs/debug.log', level=logging.DEBUG)
 
 config = ConfigParser.ConfigParser()
 config.read('settings.ini')
@@ -67,12 +70,12 @@ def download_image():
 
 def call(command):
     try:
-        print subprocess.check_output(
+        logging.debug(subprocess.check_output(
             command,
             stderr=subprocess.STDOUT,
-            shell=True)
+            shell=True))
     except subprocess.CalledProcessError, e:
-        print e.output
+        logging.error(e.output)
 
 def output_gif(filename, width=None):
     command = 'ffmpeg -pattern_type glob -i \'images/*.jpg\' -r 30'
@@ -102,7 +105,7 @@ def test_ranges():
             time = make_time(hour, minute)
             on = within_ranges(time, ranges)
 
-            print str(time) + "\t" + str(on)
+            logging.debug(str(time) + "\t" + str(on))
             minute = minute + 1
         hour = hour + 1
 
@@ -119,7 +122,7 @@ def main():
         if (on and not previously_on):
             set_lights(True)
 
-        print str(now) + "\t" + ('On' if on else 'Off')
+        logging.debug(str(now) + "\t" + ('On' if on else 'Off'))
 
         if on:
             download_image()
@@ -135,23 +138,17 @@ def main():
                 if not os.path.isfile(path):
                     set_lights(False)
 
-                    print
-                    print '------------'
-                    print
+                    logging.debug('------------')
 
-                    print 'BUILDING ' + path + \
+                    logging.debug('BUILDING ' + path + \
                         ' FROM ' + str(len(images)) + ' IMAGES: ' \
-                        + first + ' TO ' + last
-                    print
+                        + first + ' TO ' + last)
 
                     output_gif(path, SCALE)
-                    print
-                    print upload(path)
-                    delete_images()
 
-                    print
-                    print '------------'
-                    print
+                    uploaded_path = upload(path)
+                    logging.debug(uploaded_path)
+                    delete_images()
 
         time.sleep(SLEEP)
 

@@ -52,7 +52,10 @@ def upload(path):
 
     return 'http://' + SFTP_PATH + '/' + os.path.basename(path)
 
-def within_ranges(now, ranges=[]):
+def within_ranges(now, ranges=[], debug=False):
+    if debug:
+        return bool(datetime.datetime.now().minute % 2)
+
     def within_range(now, start, stop):
         return (start <= now and stop >= now)
 
@@ -108,7 +111,7 @@ def test_ranges():
             minute = minute + 1
         hour = hour + 1
 
-def main(sleep, width):
+def main(sleep, width, debug):
     on = False
 
     while True:
@@ -116,7 +119,7 @@ def main(sleep, width):
         now = datetime.datetime.time(
             datetime.datetime.now()
         )
-        on = within_ranges(now, ranges)
+        on = within_ranges(now, ranges, debug=debug)
 
         if (on and not previously_on):
             set_lights(True)
@@ -161,6 +164,9 @@ if __name__ == '__main__':
     parser.add_argument("-w", "--width", type=int, help="width of final gif",
         default=int(config.get('settings', 'scale')))
 
+    parser.add_argument("-d", "--debug", action="store_true",
+        help="run in debug mode")
+
     args = parser.parse_args()
 
-    main(sleep=args.sleep, width=args.width)
+    main(sleep=args.sleep, width=args.width, debug=args.debug)

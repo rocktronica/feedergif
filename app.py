@@ -1,3 +1,4 @@
+import argparse
 import ConfigParser
 import datetime
 import logging
@@ -17,8 +18,6 @@ HOST = config.get('settings', 'host')
 DURATION_MINUTES = int(config.get('settings', 'duration_minutes'))
 BREAKFAST_HOUR = int(config.get('settings', 'breakfast_hour'))
 DINNER_HOUR = int(config.get('settings', 'dinner_hour'))
-SLEEP = int(config.get('settings', 'sleep'))
-SCALE = int(config.get('settings', 'scale'))
 SFTP_HOST = config.get('sftp', 'host')
 SFTP_USERNAME = config.get('sftp', 'username')
 SFTP_PASSWORD = config.get('sftp', 'password')
@@ -109,7 +108,7 @@ def test_ranges():
             minute = minute + 1
         hour = hour + 1
 
-def main():
+def main(sleep, width):
     on = False
 
     while True:
@@ -144,13 +143,24 @@ def main():
                         ' FROM ' + str(len(images)) + ' IMAGES: ' \
                         + first + ' TO ' + last)
 
-                    output_gif(path, SCALE)
+                    output_gif(path, width)
 
                     uploaded_path = upload(path)
                     logging.debug(uploaded_path)
                     delete_images()
 
-        time.sleep(SLEEP)
+        time.sleep(sleep)
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-s", "--sleep", type=float,
+        help="number of seconds to sleep between taking photos",
+        default=float(config.get('settings', 'sleep')))
+
+    parser.add_argument("-w", "--width", type=int, help="width of final gif",
+        default=int(config.get('settings', 'scale')))
+
+    args = parser.parse_args()
+
+    main(sleep=args.sleep, width=args.width)

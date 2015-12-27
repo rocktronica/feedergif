@@ -16,8 +16,14 @@ WiP to send me GIFs of my cat eating food when I'm not around
 ### Bugs
 
 - gif halts on empty or corrupt photos
+- failed gifs still upload when they shouldn't
 - pi can run out of space causing curl error 23
 - if light switch is off, lights won't turn on
 - starting script immediately into active timer should delete preexisting photos
+- curl errors should not be silent
 
 ### Needs
+
+- old iPhone gets hella slow
+- log misc calls
+- don't require stftp or ifttt

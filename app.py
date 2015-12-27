@@ -2,6 +2,7 @@ import argparse
 import ConfigParser
 import datetime
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import pysftp
 import glob
 import os
@@ -9,7 +10,12 @@ import sys
 import subprocess
 import time
 
-logging.basicConfig(filename='logs/debug.log', level=logging.DEBUG)
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+logger.addHandler(TimedRotatingFileHandler('logs/debug.log',
+   when="d",
+   interval=1,
+   backupCount=7))
 
 config = ConfigParser.ConfigParser()
 config.read('settings.ini')
@@ -72,12 +78,12 @@ def download_image():
 
 def call(command):
     try:
-        logging.debug(subprocess.check_output(
+        logger.debug(subprocess.check_output(
             command,
             stderr=subprocess.STDOUT,
             shell=True))
     except subprocess.CalledProcessError, e:
-        logging.error(e.output)
+        logger.error(e.output)
 
 def output_gif(filename, width=None):
     command = 'ffmpeg -pattern_type glob -i \'images/*.jpg\' -r 30'
@@ -107,7 +113,7 @@ def test_ranges():
             time = make_time(hour, minute)
             on = within_ranges(time, ranges)
 
-            logging.debug(str(time) + "\t" + str(on))
+            logger.debug(str(time) + "\t" + str(on))
             minute = minute + 1
         hour = hour + 1
 
@@ -124,7 +130,7 @@ def main(sleep, width, debug):
         if (on and not previously_on):
             set_lights(True)
 
-        logging.debug(str(now) + "\t" + ('On' if on else 'Off'))
+        logger.debug(str(now) + "\t" + ('On' if on else 'Off'))
 
         if on:
             download_image()
@@ -140,16 +146,16 @@ def main(sleep, width, debug):
                 if not os.path.isfile(path):
                     set_lights(False)
 
-                    logging.debug('------------')
+                    logger.debug('------------')
 
-                    logging.debug('BUILDING ' + path + \
+                    logger.debug('BUILDING ' + path + \
                         ' FROM ' + str(len(images)) + ' IMAGES: ' \
                         + first + ' TO ' + last)
 
                     output_gif(path, width)
 
                     uploaded_path = upload(path)
-                    logging.debug(uploaded_path)
+                    logger.debug(uploaded_path)
                     delete_images()
 
         time.sleep(sleep)

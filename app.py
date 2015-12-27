@@ -122,15 +122,15 @@ def main(sleep, width, debug):
 
     while True:
         previously_on = on
-        now = datetime.datetime.time(
-            datetime.datetime.now()
-        )
-        on = within_ranges(now, ranges, debug=debug)
+        now = datetime.datetime.now()
+        time_now = datetime.datetime.time(now)
+        on = within_ranges(time_now, ranges, debug=debug)
 
         if (on and not previously_on):
             set_lights(True)
 
-        logger.debug(str(now) + "\t" + ('On' if on else 'Off'))
+        logger.debug(now.strftime("%Y-%m-%d %H:%M:%S")
+            + "\t" + ('On' if on else 'Off'))
 
         if on:
             download_image()

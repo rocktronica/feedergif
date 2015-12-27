@@ -69,6 +69,8 @@ ranges = [{
 }]
 
 def upload(path):
+    if not args.sftp: return
+
     (sftp_host, sftp_username, sftp_password, sftp_path) = args.sftp
 
     srv = pysftp.Connection(
@@ -127,6 +129,8 @@ def get_image_slugs():
     return []
 
 def trigger_ifttt(start):
+    if not args.ifttt: return
+
     (maker_key, start_event, end_event) = args.ifttt
 
     ifttt_url = "https://maker.ifttt.com/trigger/{}/with/key/{}".format(
@@ -184,7 +188,9 @@ def main(sleep, width, debug):
                     output_gif(path, width)
 
                     uploaded_path = upload(path)
-                    logger.debug(uploaded_path)
+                    if uploaded_path:
+                        logger.debug(uploaded_path)
+
                     delete_images()
 
         time.sleep(sleep)

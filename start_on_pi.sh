@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ssh pi@raspberrypi.internal <<'ENDSSH'
+ssh pi@pizero.local <<'ENDSSH'
 
 kill $(ps aux | grep '[p]ython app.py' | awk '{print $2}')
 cd ~/feedergif

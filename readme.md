@@ -15,12 +15,9 @@ WiP to send me GIFs of my cat eating food when I'm not around
 
 ### Bugs
 
-- **BROKEN:** 4426e5db79 removed _all_ config, not just local updates
 - gif halts on empty or corrupt photos
 - pi can run out of space causing curl error 23
 - if light switch is off, lights won't turn on
 - starting script immediately into active timer should delete preexisting photos
 
 ### Needs
-
-- move all settings into cli arguments

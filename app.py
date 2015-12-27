@@ -1,5 +1,4 @@
 import argparse
-import ConfigParser
 import datetime
 import logging
 from logging.handlers import TimedRotatingFileHandler
@@ -17,19 +16,43 @@ logger.addHandler(TimedRotatingFileHandler('logs/debug.log',
    interval=1,
    backupCount=7))
 
-config = ConfigParser.ConfigParser()
-config.read('settings.ini')
+parser = argparse.ArgumentParser(
+    description='GIFing my cat eating!',
+    usage='app.py [arguments]')
 
-HOST = config.get('settings', 'host')
-DURATION_MINUTES = int(config.get('settings', 'duration_minutes'))
-BREAKFAST_HOUR = int(config.get('settings', 'breakfast_hour'))
-DINNER_HOUR = int(config.get('settings', 'dinner_hour'))
-SFTP_HOST = config.get('sftp', 'host')
-SFTP_USERNAME = config.get('sftp', 'username')
-SFTP_PASSWORD = config.get('sftp', 'password')
-SFTP_PATH = config.get('sftp', 'path')
-IFTTT_HUE_LIGHTS_ON = config.get('ifttt', 'hue_lights_on')
-IFTTT_HUE_LIGHTS_OFF = config.get('ifttt', 'hue_lights_off')
+parser.add_argument("--host", type=str,
+    help="iPCamera host",
+    default='http://10.0.0.2')
+parser.add_argument("--sleep", type=float,
+    metavar='SECONDS',
+    help="number of seconds to sleep between taking photos",
+    default=1)
+parser.add_argument("--width", type=int,
+    metavar='WIDTH',
+    help="width of final gif",
+    default=400)
+parser.add_argument("--debug", action="store_true",
+    help="run in debug mode")
+parser.add_argument("--duration", type=float,
+    metavar='MINUTES',
+    help="duration of meal/capture, in minutes",
+    default=8)
+parser.add_argument("--breakfast", type=float,
+    metavar='HOUR',
+    help="breakfast hour",
+    default=7)
+parser.add_argument("--dinner", type=float,
+    metavar='HOUR',
+    help="dinner hour",
+    default=7)
+parser.add_argument("--sftp", nargs=4, type=str,
+    metavar=("HOST","USERNAME","PASSWORD","PATH"),
+    help="SFTP info for uploading completed GIFs")
+parser.add_argument("--ifttt", type=str, nargs=3,
+    metavar=("MAKER_KEY", "START_EVENT", "END_EVENT"),
+    help="IFTTT info for convenient external triggering")
+
+args = parser.parse_args()
 
 def make_time(hour=0, minute=0):
     today = datetime.datetime.now()
@@ -38,25 +61,27 @@ def make_time(hour=0, minute=0):
     )
 
 ranges = [{
-    'start': make_time(BREAKFAST_HOUR),
-    'stop': make_time(BREAKFAST_HOUR, DURATION_MINUTES)
+    'start': make_time(args.breakfast),
+    'stop': make_time(args.breakfast, args.duration)
 },{
-    'start': make_time(DINNER_HOUR),
-    'stop': make_time(DINNER_HOUR, DURATION_MINUTES)
+    'start': make_time(args.dinner),
+    'stop': make_time(args.dinner, args.duration)
 }]
 
 def upload(path):
-    srv = pysftp.Connection(
-        host=SFTP_HOST,
-        username=SFTP_USERNAME,
-        password=SFTP_PASSWORD)
+    (sftp_host, sftp_username, sftp_password, sftp_path) = args.sftp
 
-    with srv.cd(SFTP_PATH):
+    srv = pysftp.Connection(
+        host=sftp_host,
+        username=sftp_username,
+        password=sftp_password)
+
+    with srv.cd(sftp_path):
         srv.put(path)
 
     srv.close()
 
-    return 'http://' + SFTP_PATH + '/' + os.path.basename(path)
+    return 'http://' + sftp_path + '/' + os.path.basename(path)
 
 def within_ranges(now, ranges=[], debug=False):
     if debug:
@@ -74,7 +99,7 @@ def delete_images():
     call('rm -f images/*')
 
 def download_image():
-    call('curl -# -L --compressed ' + HOST + '/photo > "images/$(date +%s).jpg"')
+    call('curl -# -L --compressed ' + args.host + '/photo > "images/$(date +%s).jpg"')
 
 def call(command):
     try:
@@ -101,8 +126,12 @@ def get_image_slugs():
         return [os.path.basename(filename).split('.')[0] for filename in images]
     return []
 
-def set_lights(on):
-    ifttt_url = IFTTT_HUE_LIGHTS_ON if on else IFTTT_HUE_LIGHTS_OFF
+def trigger_ifttt(start):
+    (maker_key, start_event, end_event) = args.ifttt
+
+    ifttt_url = "https://maker.ifttt.com/trigger/{}/with/key/{}".format(
+        start_event if start else end_event, maker_key)
+
     call('curl --silent ' + ifttt_url + ' > /dev/null')
 
 def test_ranges():
@@ -127,7 +156,7 @@ def main(sleep, width, debug):
         on = within_ranges(time_now, ranges, debug=debug)
 
         if (on and not previously_on):
-            set_lights(True)
+            trigger_ifttt(True)
 
         logger.debug(now.strftime("%Y-%m-%d %H:%M:%S")
             + "\t" + ('On' if on else 'Off'))
@@ -144,7 +173,7 @@ def main(sleep, width, debug):
                 path = 'output/' + last.split('.')[0] + '.gif'
 
                 if not os.path.isfile(path):
-                    set_lights(False)
+                    trigger_ifttt(False)
 
                     logger.debug('------------')
 
@@ -161,18 +190,4 @@ def main(sleep, width, debug):
         time.sleep(sleep)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument("-s", "--sleep", type=float,
-        help="number of seconds to sleep between taking photos",
-        default=float(config.get('settings', 'sleep')))
-
-    parser.add_argument("-w", "--width", type=int, help="width of final gif",
-        default=int(config.get('settings', 'scale')))
-
-    parser.add_argument("-d", "--debug", action="store_true",
-        help="run in debug mode")
-
-    args = parser.parse_args()
-
     main(sleep=args.sleep, width=args.width, debug=args.debug)

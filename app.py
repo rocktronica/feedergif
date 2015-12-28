@@ -128,13 +128,16 @@ def get_image_slugs():
         return [os.path.basename(filename).split('.')[0] for filename in images]
     return []
 
-def trigger_ifttt(start):
+def trigger_ifttt(start, value1=None):
     if not args.ifttt: return
 
     (maker_key, start_event, end_event) = args.ifttt
 
     ifttt_url = "https://maker.ifttt.com/trigger/{}/with/key/{}".format(
         start_event if start else end_event, maker_key)
+
+    if value1 is not None:
+        ifttt_url = ifttt_url + '?value1=' + value1
 
     call('curl --silent ' + ifttt_url + ' > /dev/null')
 
@@ -177,8 +180,6 @@ def main(sleep, width, debug):
                 path = 'output/' + last.split('.')[0] + '.gif'
 
                 if not os.path.isfile(path):
-                    trigger_ifttt(False)
-
                     logger.debug('------------')
 
                     logger.debug('BUILDING ' + path + \
@@ -186,12 +187,12 @@ def main(sleep, width, debug):
                         + first + ' TO ' + last)
 
                     output_gif(path, width)
-
                     uploaded_path = upload(path)
-                    if uploaded_path:
-                        logger.debug(uploaded_path)
 
-                    delete_images()
+                    if uploaded_path:
+                        trigger_ifttt(False, value1=uploaded_path)
+                        logger.debug(uploaded_path)
+                        delete_images()
 
         time.sleep(sleep)
 

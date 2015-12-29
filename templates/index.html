@@ -1,0 +1,51 @@
+<!doctype html>
+<title>feedergif</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+<title>feedergif</title>
+
+<style media="screen">
+    img { max-width: 100%; }
+</style>
+
+<body class="container">
+    <div class="header clearfix">
+        <h1 class="text-muted">feedergif</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <h3>Output</h3>
+
+            <p>
+                <select class="form-control" id="gif-select">
+                    {% for output_gif in output_gif_list %}
+                    <option value="/{{ output_gif }}">
+                        {{- output_gif.split('/')[1] -}}
+                    </option>
+                    {% endfor %}
+                </select>
+            </p>
+
+            <p><img id="gif-output"></p>
+        </div>
+        <div class="col-lg-8">
+            <h3>Log</h3>
+            <pre id="log">{{ log }}</pre>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-2.1.4.js"></script>
+    <script>
+        setInterval(function() {
+            $.get("/log", function(response) {
+                $("#log").text(response);
+            })
+        }, 1000);
+
+        $("#gif-select").on("change", function() {
+            $("#gif-output").attr("src", $(this).val());
+        }).trigger("change");
+    </script>
+</body>

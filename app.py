@@ -44,7 +44,7 @@ parser.add_argument("--breakfast", type=float,
 parser.add_argument("--dinner", type=float,
     metavar='HOUR',
     help="dinner hour",
-    default=7)
+    default=19)
 parser.add_argument("--sftp", nargs=4, type=str,
     metavar=("HOST","USERNAME","PASSWORD","PATH"),
     help="SFTP info for uploading completed GIFs")

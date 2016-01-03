@@ -53,7 +53,7 @@
             <pre id="log">{{ log }}</pre>
             <p>
                 <label for="log-live-update">
-                    <input type="checkbox" id="log-live-update" checked>
+                    <input type="checkbox" id="log-live-update">
                     Live update
                 </label>
             </p>
@@ -63,8 +63,8 @@
     <script src="https://code.jquery.com/jquery-2.1.4.js"></script>
     <script>
         setInterval(function() {
+            if (!$("#log-live-update").is(":checked")) { return; }
             $.get("/log", function(response) {
-                if (!$("#log-live-update").is(":checked")) { return; }
                 $("#log").text(response);
             })
         }, 1000);

@@ -6,7 +6,7 @@
 <title>feedergif</title>
 
 <style media="screen">
-    img { max-width: 100%; }
+    img { width: 100%; }
 </style>
 
 <body class="container">
@@ -15,7 +15,7 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-4">
+        <div class="col-md-4">
             <h3>Output</h3>
 
             <p>
@@ -30,9 +30,15 @@
 
             <p><img id="gif-output"></p>
         </div>
-        <div class="col-lg-8">
+        <div class="col-md-8">
             <h3>Log</h3>
             <pre id="log">{{ log }}</pre>
+            <p>
+                <label for="log-live-update">
+                    <input type="checkbox" id="log-live-update" checked>
+                    Live update
+                </label>
+            </p>
         </div>
     </div>
 
@@ -40,6 +46,7 @@
     <script>
         setInterval(function() {
             $.get("/log", function(response) {
+                if (!$("#log-live-update").is(":checked")) { return; }
                 $("#log").text(response);
             })
         }, 1000);

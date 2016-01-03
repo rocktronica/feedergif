@@ -4,6 +4,12 @@ WiP to send me GIFs of my cat eating food when I'm not around
 
 ![Hey bud](http://rocktronica.github.io/feedergif/1450364853.gif)
 
+## To run
+
+``` bash
+ssh -T pi@pizero.local "bash -s" -- < start.sh [arguments to pass to app.py]
+```
+
 ## Tech
 
 - Old iPhone w/ [iPCamera](https://itunes.apple.com/us/app/ipcamera-high-end-network/id570912928?mt=8) app
@@ -11,7 +17,6 @@ WiP to send me GIFs of my cat eating food when I'm not around
 - Server for hosting images
 - [Hue](http://www2.meethue.com/en-us/products/) lights
 - Misc IFTTT triggers for convenience
-
 
 ### Bugs
 
@@ -21,6 +26,7 @@ WiP to send me GIFs of my cat eating food when I'm not around
 - if light switch is off, lights won't turn on
 - starting script immediately into active timer should delete preexisting photos
 - curl errors should not be silent
+- run scripts in loops?
 
 ### Needs
 

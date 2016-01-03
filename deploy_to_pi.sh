@@ -11,4 +11,4 @@ sudo pip install ecdsa
 sudo pip install pysftp
 sudo pip install Flask'
 
-rsync -avz --delete app.py server.py --progress pi@pizero.local:~/feedergif/
+rsync -avz --delete app.py server.py start.sh --progress pi@pizero.local:~/feedergif/

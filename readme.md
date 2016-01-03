@@ -7,7 +7,7 @@ WiP to send me GIFs of my cat eating food when I'm not around
 ## To run
 
 ``` bash
-ssh -T pi@pizero.local "bash -s" -- < start.sh [arguments to pass to app.py]
+ssh -T name@pi.local "bash -s" -- < start.sh [arguments to pass to app.py]
 ```
 
 ## Tech

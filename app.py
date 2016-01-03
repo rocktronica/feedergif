@@ -190,9 +190,10 @@ def main(sleep, width, debug):
                     uploaded_path = upload(path)
 
                     if uploaded_path:
-                        trigger_ifttt(False, value1=uploaded_path)
                         logger.debug(uploaded_path)
-                        delete_images()
+
+                    trigger_ifttt(False, value1=uploaded_path or '')
+                    delete_images()
 
         time.sleep(sleep)
 

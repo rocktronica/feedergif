@@ -17,7 +17,6 @@
     <div class="row">
         <div class="col-md-4">
             <h3>Output</h3>
-
             <p>
                 <select class="form-control" id="gif-select">
                     {% for output_gif in output_gif_list %}
@@ -27,8 +26,27 @@
                     {% endfor %}
                 </select>
             </p>
-
             <p><img id="gif-output"></p>
+
+            <h3>Stats</h3>
+            <table class="table table-bordered table-condensed">
+                <tr>
+                    <th>Size</th>
+                    <td>{{ stats.size }}</td>
+                </tr>
+                <tr>
+                    <th>Used</th>
+                    <td>{{ stats.used }}</td>
+                </tr>
+                <tr>
+                    <th>Available</th>
+                    <td>{{ stats.available }}</td>
+                </tr>
+                <tr>
+                    <th>% Used</th>
+                    <td>{{ stats.percent_used }}</td>
+                </tr>
+            </table>
         </div>
         <div class="col-md-8">
             <h3>Log</h3>

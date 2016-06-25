@@ -33,3 +33,5 @@ ssh -T name@pi.local "bash -s" -- < start.sh [arguments to pass to app.py]
 - old iPhone gets hella slow
 - log misc calls
 - don't require stftp or ifttt
+- errors from bad arguments don't show in logs
+- IOError: [Errno 13] Permission denied: '/home/tommy/feedergif/logs/debug.log'

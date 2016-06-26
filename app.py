@@ -9,6 +9,18 @@ import sys
 import subprocess
 import time
 
+def has_program(program):
+    try:
+        subprocess.check_call(['which', program])
+    except subprocess.CalledProcessError:
+        return False
+    else:
+        return True
+
+if (not has_program('ffmpeg')):
+    print 'Missing ffmpeg dependency'
+    sys.exit(1)
+
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 logger.addHandler(TimedRotatingFileHandler('logs/debug.log',

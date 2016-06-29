@@ -32,9 +32,9 @@ parser = argparse.ArgumentParser(
     description='GIFing my cat eating!',
     usage='app.py [arguments]')
 
-parser.add_argument("--host", type=str,
-    help="iPCamera host",
-    default='http://10.0.0.2')
+parser.add_argument("--url", type=str,
+    help="Camera photo capture url",
+    default='http://localhost/capture')
 parser.add_argument("--sleep", type=float,
     metavar='SECONDS',
     help="number of seconds to sleep between taking photos",
@@ -113,7 +113,7 @@ def delete_images():
     call('rm -f images/*')
 
 def download_image():
-    call('curl -# -L --compressed ' + args.host + '/photo > "images/$(date +%s).jpg"')
+    call('curl -# -L --compressed ' + args.url + ' > "images/$(date +%s).jpg"')
 
 def call(command):
     try:

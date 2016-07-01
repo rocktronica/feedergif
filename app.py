@@ -85,17 +85,20 @@ def upload(path):
 
     (sftp_host, sftp_username, sftp_password, sftp_path) = args.sftp
 
-    srv = pysftp.Connection(
-        host=sftp_host,
-        username=sftp_username,
-        password=sftp_password)
+    try:
+        srv = pysftp.Connection(
+            host=sftp_host,
+            username=sftp_username,
+            password=sftp_password)
 
-    with srv.cd(sftp_path):
-        srv.put(path)
+        with srv.cd(sftp_path):
+            srv.put(path)
 
-    srv.close()
+        srv.close()
 
-    return 'http://' + sftp_path + '/' + os.path.basename(path)
+        return 'http://' + sftp_path + '/' + os.path.basename(path)
+    except Exception as e:
+        logger.debug('The SFTP upload failed: ' + str(e))
 
 def within_ranges(now, ranges=[], debug=False):
     if debug:

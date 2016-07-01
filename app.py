@@ -132,6 +132,9 @@ def call(command):
     except subprocess.CalledProcessError, e:
         logger.error(e.output)
 
+def delete_empty_images():
+    call('find images -size 0 -delete')
+
 def output_gif(filename, width=None):
     command = 'ffmpeg -pattern_type glob -i \'images/*.jpg\' -r 30'
 
@@ -191,6 +194,7 @@ def main(sleep, width, debug):
         if on:
             download_image()
         else:
+            delete_empty_images()
             images = get_image_slugs()
 
             if len(images) >= 1:

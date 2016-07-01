@@ -20,7 +20,6 @@ ssh -T name@pi.local "bash -s" -- < start.sh [arguments to pass to app.py]
 
 ### Bugs
 
-- gif halts on empty or corrupt photos
 - failed gifs still upload when they shouldn't
 - pi can run out of space causing curl error 23
 - if light switch is off, lights won't turn on

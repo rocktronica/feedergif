@@ -27,7 +27,6 @@ ssh -T name@pi.local "bash -s" -- < start.sh [arguments to pass to app.py]
 - starting script immediately into active timer should delete preexisting photos
 - curl errors should not be silent
 - run scripts in loops?
-- download needs a timeout
 - decouple ifttt lights vs email -- missing images shouldn't get email
 
 ### Needs

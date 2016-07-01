@@ -57,6 +57,10 @@ parser.add_argument("--dinner", type=float,
     metavar='HOUR',
     help="dinner hour",
     default=20)
+parser.add_argument("--timeout", type=float,
+    metavar='SECONDS',
+    help="seconds to try downloading image before timing out",
+    default=10)
 parser.add_argument("--sftp", nargs=4, type=str,
     metavar=("HOST","USERNAME","PASSWORD","PATH"),
     help="SFTP info for uploading completed GIFs")
@@ -116,7 +120,8 @@ def delete_images():
     call('rm -f images/*')
 
 def download_image():
-    call('curl -# -L --compressed ' + args.url + ' > "images/$(date +%s).jpg"')
+    call('curl -# -L --max-time ' + str(args.timeout) +
+        ' --compressed ' + args.url + ' > "images/$(date +%s).jpg"')
 
 def call(command):
     try:

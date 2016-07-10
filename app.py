@@ -45,6 +45,8 @@ parser.add_argument("--width", type=int,
     default=400)
 parser.add_argument("--debug", action="store_true",
     help="run in debug mode")
+parser.add_argument("--test", action="store_true",
+    help="run the tests and quit")
 parser.add_argument("--duration", type=float,
     metavar='MINUTES',
     help="duration of meal/capture, in minutes",
@@ -172,11 +174,15 @@ def test_ranges():
             time = make_time(hour, minute)
             on = within_ranges(time, ranges)
 
-            logger.debug(str(time) + "\t" + str(on))
+            print str(time) + "\t" + str(on)
             minute = minute + 1
         hour = hour + 1
 
-def main(sleep, width, debug):
+def main(sleep, width, debug=False, test=False):
+    if test:
+        test_ranges()
+        sys.exit(0)
+
     on = False
 
     while True:
@@ -222,4 +228,4 @@ def main(sleep, width, debug):
         time.sleep(sleep)
 
 if __name__ == '__main__':
-    main(sleep=args.sleep, width=args.width, debug=args.debug)
+    main(sleep=args.sleep, width=args.width, debug=args.debug, test=args.test)

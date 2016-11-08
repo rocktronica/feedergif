@@ -75,7 +75,12 @@ args = parser.parse_args()
 def make_time(hour=0, minute=0):
     today = datetime.datetime.now()
     return datetime.datetime.time(
-        today.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        today.replace(
+            hour=int(hour),
+            minute=int(minute),
+            second=0,
+            microsecond=0
+        )
     )
 
 ranges = [{

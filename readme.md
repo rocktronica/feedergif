@@ -12,7 +12,7 @@ ssh -T name@pi.local "bash -s" -- < start.sh [arguments to pass to app.py]
 
 ## Tech
 
-- Webcamera or [iPCamera](https://itunes.apple.com/us/app/ipcamera-high-end-network/id570912928?mt=8)
+- Webcamera,  [iPCamera](https://itunes.apple.com/us/app/ipcamera-high-end-network/id570912928?mt=8), or Facetime/rPi camera via [camcamcam](https://github.com/rocktronica/camcamcam)
 - Python script on Raspberry Pi connected to same home network
 - Server for hosting images
 - [Hue](http://www2.meethue.com/en-us/products/) lights

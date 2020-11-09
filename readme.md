@@ -2,7 +2,7 @@
 
 WiP to send me GIFs of my cat eating food when I'm not around
 
-![Hey bud](http://rocktronica.github.io/feedergif/1450364853.gif)
+![Hey bud](example.gif)
 
 ## To run
 
